@@ -22,7 +22,6 @@ import {
   GraduationCap,
   MessageSquareText,
   Building2,
-  UserPlus,
 } from "lucide-react";
 import { NotificationCenter } from "./NotificationCenter";
 import { SignOutButton } from "./SignOutButton";
@@ -42,7 +41,11 @@ export function DashboardLayout({ children, role }: DashboardLayoutProps) {
       { name: "My Profile", href: "/candidate/profile", icon: User },
       { name: "Interviews", href: "/candidate/interviews", icon: Calendar },
       { name: "My Placements", href: "/candidate/placements", icon: Briefcase },
-      { name: "Career Development", href: "/candidate/career", icon: GraduationCap },
+      {
+        name: "Career Development",
+        href: "/candidate/career",
+        icon: GraduationCap,
+      },
     ],
     employer: [
       { name: "Overview", href: "/employer", icon: LayoutDashboard },
@@ -55,14 +58,30 @@ export function DashboardLayout({ children, role }: DashboardLayoutProps) {
     ],
     admin: [
       { name: "Overview", href: "/admin", icon: LayoutDashboard },
-      { name: "Candidate Invitations", href: "/admin/invitations", icon: UserPlus },
       { name: "Workflow Reviews", href: "/admin/reviews", icon: ShieldCheck },
-      { name: "Verifications", href: "/admin/verifications", icon: ShieldCheck },
-      { name: "Decline Monitoring", href: "/admin/decline-monitoring", icon: AlertTriangle },
-      { name: "Confidential Feedback", href: "/admin/feedback", icon: MessageSquareText },
+      {
+        name: "Verifications",
+        href: "/admin/verifications",
+        icon: ShieldCheck,
+      },
+      {
+        name: "Profile Approvals",
+        href: "/admin/profile-approvals",
+        icon: FileText,
+      }, // NEW
+      { name: "Training", href: "/admin/training", icon: GraduationCap },
+      {
+        name: "Decline Monitoring",
+        href: "/admin/decline-monitoring",
+        icon: AlertTriangle,
+      },
+      {
+        name: "Confidential Feedback",
+        href: "/admin/feedback",
+        icon: MessageSquareText,
+      },
       { name: "Finance & Payments", href: "/admin/finance", icon: CreditCard },
       { name: "Placement Funnel", href: "/admin/placements", icon: TrendingUp },
-      { name: "Training Impact", href: "/admin/training", icon: GraduationCap },
       { name: "Audit Logs", href: "/admin/audit", icon: History },
     ],
   };
@@ -81,7 +100,10 @@ export function DashboardLayout({ children, role }: DashboardLayoutProps) {
 
   return (
     <div className="relative min-h-screen flex bg-[var(--color-background)]">
-      <div className="brand-ribbon fixed inset-x-0 top-0 z-30 h-1" aria-hidden="true" />
+      <div
+        className="brand-ribbon fixed inset-x-0 top-0 z-30 h-1"
+        aria-hidden="true"
+      />
       {/* Desktop Sidebar */}
       <aside className="fixed z-20 hidden h-full w-64 flex-col border-r border-slate-200 bg-white md:flex">
         <div className="h-16 flex items-center px-6 border-b border-slate-100">
@@ -133,7 +155,9 @@ export function DashboardLayout({ children, role }: DashboardLayoutProps) {
           <div className="flex items-center md:hidden">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              aria-label={isMobileMenuOpen ? "Close navigation" : "Open navigation"}
+              aria-label={
+                isMobileMenuOpen ? "Close navigation" : "Open navigation"
+              }
               aria-expanded={isMobileMenuOpen}
               className="rounded-md p-2 text-slate-600 hover:bg-primary-50 hover:text-primary-800"
             >
@@ -148,7 +172,7 @@ export function DashboardLayout({ children, role }: DashboardLayoutProps) {
           <div className="flex items-center gap-4 ml-auto">
             {/* Replaced static bell with the functional NotificationCenter */}
             <NotificationCenter role={role} />
-            
+
             <div
               aria-label={`${roleTitle} account`}
               className="flex h-9 w-9 items-center justify-center rounded-full border border-primary-200 bg-primary-100 text-xs font-bold text-primary-800"
@@ -160,7 +184,10 @@ export function DashboardLayout({ children, role }: DashboardLayoutProps) {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <nav aria-label={`${roleTitle} navigation`} className="border-b border-slate-200 bg-white p-4 md:hidden">
+          <nav
+            aria-label={`${roleTitle} navigation`}
+            className="border-b border-slate-200 bg-white p-4 md:hidden"
+          >
             {currentNav.map((item) => (
               <Link
                 key={item.name}

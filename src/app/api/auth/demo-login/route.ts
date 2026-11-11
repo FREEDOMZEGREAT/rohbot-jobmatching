@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
+import { isLocalDemoRequest } from "@/lib/demo/request-guards";
 
 const DEMO_ROLES = ["employer", "admin"] as const;
 type DemoRole = (typeof DEMO_ROLES)[number];
@@ -10,18 +11,9 @@ function isDemoRole(role: unknown): role is DemoRole {
 
 export async function POST(request: NextRequest) {
   if (process.env.NODE_ENV === "production") {
-    return NextResponse.json({ error: "Demo sign-in is unavailable." }, { status: 404 });
+    return NextResponse.json({ error: "Demo sign-in is unavailable in production." }, { status: 404 });
   }
-
-  const host = request.headers.get("host");
-  let hostname = "";
-  try {
-    hostname = host ? new URL(`http://${host}`).hostname : "";
-  } catch {
-    return NextResponse.json({ error: "Demo sign-in is only available locally." }, { status: 403 });
-  }
-
-  if (!["localhost", "127.0.0.1", "[::1]", "::1"].includes(hostname)) {
+  if (!isLocalDemoRequest(request)) {
     return NextResponse.json({ error: "Demo sign-in is only available locally." }, { status: 403 });
   }
 

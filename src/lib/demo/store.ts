@@ -80,12 +80,42 @@ export interface DemoSession {
   accountId: string;
 }
 
+export interface DemoTrainer {
+  id: string;
+  fullName: string;
+  email: string;
+  emailVerified: boolean;
+  trainingCompleted: boolean;
+  invitationSent: boolean;
+  profileCreated: boolean;
+  registeredAt: string;
+  verificationTokenHash?: string;
+  verificationExpiresAt?: string;
+  invitationTokenHash?: string;
+  invitationExpiresAt?: string;
+}
+
+export interface DemoTrainingEmail {
+  id: string;
+  to: string;
+  subject: string;
+  body: string;
+  link: string;
+  type: "email_verification" | "training_invitation";
+  sentAt: string;
+  opened: boolean;
+}
+
 export interface DemoStore {
   invitations: Map<string, DemoInvitation>;
   candidates: Map<string, DemoCandidateAccount>;
   employers: Map<string, DemoEmployerAccount>;
   otps: Map<string, DemoOtp>;
   sessions: Map<string, DemoSession>;
+  trainers: Map<string, DemoTrainer>;
+  trainingEmails: Map<string, DemoTrainingEmail>;
+  trainingQrActive: boolean;
+  trainingQrExpiresAt: string | null;
 }
 
 const globalDemoStore = globalThis as typeof globalThis & {
@@ -100,7 +130,16 @@ export const demoStore =
     employers: new Map(),
     otps: new Map(),
     sessions: new Map(),
+    trainers: new Map(),
+    trainingEmails: new Map(),
+    trainingQrActive: false,
+    trainingQrExpiresAt: null,
   });
+
+demoStore.trainers ??= new Map();
+demoStore.trainingEmails ??= new Map();
+demoStore.trainingQrActive ??= false;
+demoStore.trainingQrExpiresAt ??= null;
 
 export function newDemoId(): string {
   return randomUUID();

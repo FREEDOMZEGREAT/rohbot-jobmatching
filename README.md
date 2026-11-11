@@ -16,6 +16,18 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## Test trainer QR registration locally
+
+The trainer QR workflow is a local development demo. It is not enabled by `npm start` or a production build, and trainer verification email is simulated rather than delivered. The `npm run dev` script explicitly sets development mode and listens on the local network.
+
+1. Stop any running production server, then start the app with `npm run dev`.
+2. Find the computer's private Wi-Fi IPv4 address with `ipconfig`.
+3. Open the app on the computer using `http://<computer-ip>:3000`, sign in as the demo admin, and activate the trainer QR.
+4. Scan the refreshed QR from a phone on the same Wi-Fi network and register with a name and email.
+5. On successful registration, use the displayed **Verify this email** test link. Trainer emails are also recorded in the local demo inbox.
+
+The registration state is kept in server memory and is lost when the development server restarts. Allow the development server through the computer's firewall for the private network if the phone cannot connect.
+
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.

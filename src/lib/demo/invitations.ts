@@ -106,7 +106,7 @@ function isValidPassword(password: string): boolean {
   return password.length >= 12 && password.length <= 128;
 }
 
-function accountExists(email: string): boolean {
+export function isDemoAccountEmailRegistered(email: string): boolean {
   const normalizedEmail = normalizeDemoEmail(email);
   return (
     demoStore.candidates.has(normalizedEmail) ||
@@ -226,7 +226,7 @@ export function registerDemoCandidate(
   if (!isValidPassword(input.password)) {
     return { success: false, message: "Use a password between 12 and 128 characters." };
   }
-  if (accountExists(email)) {
+  if (isDemoAccountEmailRegistered(email)) {
     return { success: false, message: "This email address is already registered." };
   }
 
@@ -276,7 +276,7 @@ export function registerDemoEmployer(
   ) {
     return { success: false, message: "Attach a PDF or image business-license file up to 2 MB." };
   }
-  if (accountExists(email) || accountExists(hrEmail)) {
+  if (isDemoAccountEmailRegistered(email) || isDemoAccountEmailRegistered(hrEmail)) {
     return { success: false, message: "One of these email addresses is already registered." };
   }
 
@@ -302,6 +302,53 @@ export function registerDemoEmployer(
   demoStore.employers.set(account.id, account);
   issueDemoOtp("employer", account);
   return { success: true, message: "Organization registered. Enter the verification code shown in the demo admin inbox." };
+}
+
+export function registerDemoTrainerCandidate(input: {
+  trainerId: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  password: string;
+}): { success: boolean; message: string } {
+  const fullName = input.fullName.trim().replace(/\s+/g, " ");
+  const email = normalizeDemoEmail(input.email);
+  const phone = input.phone.trim();
+  if (
+    fullName.length < 2 ||
+    fullName.length > 120 ||
+    !email ||
+    email.length > 254 ||
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
+    !phone ||
+    phone.length > 30
+  ) {
+    return { success: false, message: "Enter a valid full name, email, and phone number." };
+  }
+  if (!isValidPassword(input.password)) {
+    return { success: false, message: "Use a password between 12 and 128 characters." };
+  }
+  if (isDemoAccountEmailRegistered(email)) {
+    return { success: false, message: "This email address is already registered." };
+  }
+
+  const [firstName, ...remainingName] = fullName.split(" ");
+  const salt = randomBytes(PASSWORD_SALT_BYTES);
+  const account: DemoCandidateAccount = {
+    id: newDemoId(),
+    firstName,
+    secondName: remainingName.join(" "),
+    email,
+    phone,
+    passwordSalt: salt.toString("hex"),
+    passwordHash: passwordDigest(input.password, salt).toString("hex"),
+    invitationId: input.trainerId,
+    emailVerified: true,
+    status: "Pending admin approval",
+    createdAt: new Date().toISOString(),
+  };
+  demoStore.candidates.set(email, account);
+  return { success: true, message: "Candidate account created. You can now sign in." };
 }
 
 function issueDemoOtp(role: "candidate" | "employer", account: DemoCandidateAccount | DemoEmployerAccount) {

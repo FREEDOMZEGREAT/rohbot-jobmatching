@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { isLocalDemoRequest } from "@/lib/demo/request-guards";
 
 // Define protected route prefixes and their required roles
 const ROUTE_GUARDS = [
@@ -22,14 +23,12 @@ export function proxy(request: NextRequest) {
   const authRole = request.cookies.get("rohobot_role")?.value; // Set by backend on login
   const access = request.cookies.get("rohobot_access")?.value;
   const isDemoSession = sessionCookie?.startsWith("demo-") ?? false;
-  const isLocalHost = ["localhost", "127.0.0.1", "[::1]"].includes(
-    request.nextUrl.hostname
-  );
+  const isLocalDevelopment = isLocalDemoRequest(request);
 
   // 3. If no session, redirect to login
   if (
     !sessionCookie ||
-    (isDemoSession && (process.env.NODE_ENV === "production" || !isLocalHost))
+    (isDemoSession && !isLocalDevelopment)
   ) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("redirect", pathname);

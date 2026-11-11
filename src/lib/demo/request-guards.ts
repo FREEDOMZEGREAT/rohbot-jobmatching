@@ -1,9 +1,20 @@
 import type { NextRequest } from "next/server";
 
+export function getDemoRequestOrigin(request: NextRequest): string {
+  const host = request.headers.get("host");
+  if (!host) return request.nextUrl.origin;
+
+  try {
+    return new URL(`${request.nextUrl.protocol}//${host}`).origin;
+  } catch {
+    return request.nextUrl.origin;
+  }
+}
+
 export function isLocalDemoRequest(request: NextRequest): boolean {
   return (
     process.env.NODE_ENV !== "production" &&
-    ["localhost", "127.0.0.1", "[::1]"].includes(request.nextUrl.hostname)
+    (request.nextUrl.protocol === "http:" || request.nextUrl.protocol === "https:")
   );
 }
 
